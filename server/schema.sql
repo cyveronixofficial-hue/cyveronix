@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS internships(
   id SERIAL PRIMARY KEY, title TEXT NOT NULL, domain TEXT NOT NULL, duration TEXT,
   mode TEXT, stipend TEXT, description TEXT, skills TEXT, open BOOLEAN DEFAULT true,
-  min_months INT NOT NULL DEFAULT 1, max_months INT NOT NULL DEFAULT 6, stipend_amount INT, fee_amount INT NOT NULL DEFAULT 0);
+  min_months INT NOT NULL DEFAULT 1, max_months INT NOT NULL DEFAULT 6, stipend_amount INT, fee_amount INT NOT NULL DEFAULT 0, fee_label TEXT, fee_note TEXT);
 CREATE TABLE IF NOT EXISTS students(
   id SERIAL PRIMARY KEY, name TEXT NOT NULL, email TEXT UNIQUE NOT NULL, phone TEXT NOT NULL,
   password_hash TEXT NOT NULL, created_at TIMESTAMPTZ DEFAULT now());

@@ -36,3 +36,7 @@ ALTER TABLE applications ADD COLUMN IF NOT EXISTS stipend_monthly INT;
 -- v7: one-time certification fee set by admin for each internship (not multiplied by months)
 ALTER TABLE internships ADD COLUMN IF NOT EXISTS fee_amount INT NOT NULL DEFAULT 0;
 ALTER TABLE applications ADD COLUMN IF NOT EXISTS internship_fee INT;
+
+-- v8: admin-editable fee title and fee text for each internship
+ALTER TABLE internships ADD COLUMN IF NOT EXISTS fee_label TEXT;
+ALTER TABLE internships ADD COLUMN IF NOT EXISTS fee_note TEXT;

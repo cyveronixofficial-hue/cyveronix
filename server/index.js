@@ -179,6 +179,7 @@ const cleanJob = b => {
   if (j.stipend_amount < 0 || j.stipend_amount > 1000000) throw bad('Stipend must be between 0 and 10,00,000');
   j.fee_amount = Math.floor(+b.fee_amount || 0);
   if (j.fee_amount < 0 || j.fee_amount > 100000) throw bad('Fee must be between 0 and 1,00,000');
+  j.fee_label = txt(b.fee_label, 60) || null; j.fee_note = txt(b.fee_note, 600) || null;
   j.stipend = j.stipend_amount ? '₹' + j.stipend_amount.toLocaleString('en-IN') + '/month' : '';
   j.duration = j.min_months === j.max_months ? `${j.min_months} month${j.min_months > 1 ? 's' : ''}` : `${j.min_months}-${j.max_months} months`;
   return j;
@@ -186,11 +187,11 @@ const cleanJob = b => {
 app.get('/api/admin/internships', admin, wrap(async (_, s) => s.json((await pool.query('SELECT i.*, (SELECT COUNT(*) FROM applications a WHERE a.internship_id=i.id)::int AS applications FROM internships i ORDER BY i.id')).rows)));
 app.post('/api/admin/internships', admin, wrap(async (q, s) => {
   const j = cleanJob(q.body);
-  s.json((await pool.query('INSERT INTO internships(title,domain,duration,mode,stipend,description,skills,open,min_months,max_months,stipend_amount,fee_amount) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *', [j.title, j.domain, j.duration, j.mode, j.stipend, j.description, j.skills, j.open, j.min_months, j.max_months, j.stipend_amount, j.fee_amount])).rows[0]);
+  s.json((await pool.query('INSERT INTO internships(title,domain,duration,mode,stipend,description,skills,open,min_months,max_months,stipend_amount,fee_amount,fee_label,fee_note) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14) RETURNING *', [j.title, j.domain, j.duration, j.mode, j.stipend, j.description, j.skills, j.open, j.min_months, j.max_months, j.stipend_amount, j.fee_amount, j.fee_label, j.fee_note])).rows[0]);
 }));
 app.put('/api/admin/internships/:id', admin, wrap(async (q, s) => {
   const j = cleanJob(q.body);
-  const r = await pool.query('UPDATE internships SET title=$1,domain=$2,duration=$3,mode=$4,stipend=$5,description=$6,skills=$7,open=$8,min_months=$9,max_months=$10,stipend_amount=$11,fee_amount=$12 WHERE id=$13 RETURNING *', [j.title, j.domain, j.duration, j.mode, j.stipend, j.description, j.skills, j.open, j.min_months, j.max_months, j.stipend_amount, j.fee_amount, q.params.id]);
+  const r = await pool.query('UPDATE internships SET title=$1,domain=$2,duration=$3,mode=$4,stipend=$5,description=$6,skills=$7,open=$8,min_months=$9,max_months=$10,stipend_amount=$11,fee_amount=$12,fee_label=$13,fee_note=$14 WHERE id=$15 RETURNING *', [j.title, j.domain, j.duration, j.mode, j.stipend, j.description, j.skills, j.open, j.min_months, j.max_months, j.stipend_amount, j.fee_amount, j.fee_label, j.fee_note, q.params.id]);
   r.rowCount ? s.json(r.rows[0]) : s.status(404).json({ error: 'Internship not found' });
 }));
 app.delete('/api/admin/internships/:id', admin, wrap(async (q, s) => {
@@ -422,6 +423,8 @@ try {
     ALTER TABLE applications ADD COLUMN IF NOT EXISTS months INT;
     ALTER TABLE applications ADD COLUMN IF NOT EXISTS stipend_monthly INT;
     ALTER TABLE internships ADD COLUMN IF NOT EXISTS fee_amount INT NOT NULL DEFAULT 0;
+    ALTER TABLE internships ADD COLUMN IF NOT EXISTS fee_label TEXT;
+    ALTER TABLE internships ADD COLUMN IF NOT EXISTS fee_note TEXT;
     ALTER TABLE applications ADD COLUMN IF NOT EXISTS internship_fee INT;
     CREATE TABLE IF NOT EXISTS gallery_items(id SERIAL PRIMARY KEY, category TEXT NOT NULL DEFAULT 'General', title TEXT NOT NULL, location TEXT, image TEXT NOT NULL, created_at TIMESTAMPTZ DEFAULT now());
     CREATE TABLE IF NOT EXISTS leaders(id SERIAL PRIMARY KEY, name TEXT NOT NULL, role TEXT NOT NULL, bio TEXT, image TEXT, position INT DEFAULT 0, created_at TIMESTAMPTZ DEFAULT now());`);

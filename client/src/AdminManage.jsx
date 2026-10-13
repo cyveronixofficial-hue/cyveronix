@@ -13,7 +13,7 @@ function ImagePick({ value, onChange, optional }) {
 const Empty = ({ children }) => <div className="empty">{children}</div>;
 
 // ---------- Internships ----------
-const blankJob = { title: '', domain: '', min_months: 1, max_months: 6, mode: 'Remote', stipend_amount: 0, fee_amount: 0, skills: '', description: '', open: true };
+const blankJob = { title: '', domain: '', min_months: 1, max_months: 6, mode: 'Remote', stipend_amount: 0, fee_amount: 0, fee_label: '', fee_note: '', skills: '', description: '', open: true };
 const dur = j => j.min_months === j.max_months ? `${j.min_months} month${j.min_months > 1 ? 's' : ''}` : `${j.min_months}-${j.max_months} months`;
 export function Jobs({ call }) {
   const [list, setList] = useState(null), [f, setF] = useState(blankJob), [edit, setEdit] = useState(null), [msg, setMsg] = useState('');
@@ -40,6 +40,8 @@ export function Jobs({ call }) {
       <label>Mode<select value={f.mode} onChange={set('mode')}><option>Remote</option><option>Hybrid</option><option>On-site</option></select></label>
       <label>Stipend per month (₹)<input type="number" min="0" step="500" value={f.stipend_amount} onChange={set('stipend_amount')} placeholder="8000 (enter 0 if unpaid)" /><small className="mut">Shown to students on the Careers page and on the application form.</small></label>
       <label>Certification fee (₹, one-time)<input type="number" min="0" step="1" value={f.fee_amount} onChange={set('fee_amount')} placeholder="99 (enter 0 if there is no fee)" /><small className="mut">A single flat amount for this internship, not multiplied by the months a student picks. Shown on the application form as the fee for the certificate and hands-on experience on real projects.</small></label>
+      <label>Fee title<input value={f.fee_label || ''} onChange={set('fee_label')} maxLength={60} placeholder="Certification fee" /><small className="mut">Heading shown above the fee box on the application form. Leave empty to use "Certification fee".</small></label>
+      <label className="wide">Fee text<textarea rows="3" value={f.fee_note || ''} onChange={set('fee_note')} maxLength={600} placeholder="The fee for this internship is {fee}, paid once, no matter how many months you choose. It covers your internship certification." /><small className="mut">Shown to students under the title. Write {'{fee}'} where the amount should appear. Leave empty to use the standard text.</small></label>
       <label>Skills<input value={f.skills} onChange={set('skills')} placeholder="HTML, CSS, React" /></label>
       <label>Description<textarea rows="4" value={f.description} onChange={set('description')} /></label>
       <label className="chk"><input type="checkbox" checked={f.open} onChange={e => setF({ ...f, open: e.target.checked })} /> Open for applications</label>

@@ -20,9 +20,11 @@ export default function Apply({ id, user }) {
   if (!job) return <section className="sec"><p>Loading…</p></section>;
   const months = Array.from({ length: job.max_months - job.min_months + 1 }, (_, k) => job.min_months + k);
   const fee = +job.fee_amount || 0;
+  const feeTitle = job.fee_label || 'Certification fee';
+  const feeText = job.fee_note ? job.fee_note.split('{fee}').join(rupee(fee)) : null;
   return (<section className="sec"><h1>Apply: {job.title}</h1><p>Domain: {job.domain}. After you apply, our team will send you an aptitude test.{fee > 0 ? ' After you complete it, we request the certification fee and then schedule your interview.' : ' After you complete it, we schedule your interview.'}</p>
-    {fee > 0 && <div className="feeinfo"><h3>Certification fee</h3>
-      <p>The fee for this internship is <b>{rupee(fee)}</b>, paid once, no matter how many months you choose. It covers your <b>internship certification</b> and <b>hands-on experience on real projects</b>.</p>
+    {fee > 0 && <div className="feeinfo"><h3>{feeTitle}</h3>
+      {feeText ? <p>{feeText}</p> : <p>The fee for this internship is <b>{rupee(fee)}</b>, paid once, no matter how many months you choose. It covers your <b>internship certification</b> and <b>hands-on experience on real projects</b>.</p>}
       <ol><li><b>Apply now.</b> You pay nothing while submitting this form.</li><li><b>Take the aptitude test.</b> We review your application and send the test to your My application page.</li><li><b>Pay the fee after the test.</b> Once you complete the test, we confirm the exact amount. Pay by Google Pay or any UPI app, then enter the 12-digit UTR number.</li><li><b>Interview.</b> After payment is confirmed we schedule your interview.</li></ol></div>}
     <form className="form" onSubmit={submit}>{fields.map(f => <label key={f.name} className={f.wide ? 'wide' : ''}>{f.label}{f.opt ? ' (optional)' : ''}
       {f.phone ? <PhoneInput cc={v.cc} num={v.num} set={up} />
